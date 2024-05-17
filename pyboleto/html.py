@@ -14,6 +14,8 @@ import string
 import sys
 import codecs
 import base64
+import qrcode
+from io import BytesIO
 
 from itertools import chain
 if sys.version_info < (3,):
@@ -97,11 +99,12 @@ class BoletoHTML(object):
         # Cabeçalho
         tpl_data['logo_img'] = ''
         if boletoDados.logo_image:
-            img = codecs.open(self._load_image(boletoDados.logo_image))
-            aux = img.read()
-            aux = base64.b64encode(aux)
-            img_base64 = 'data:image/jpeg;base64,{0}'.format(aux)
-            tpl_data['logo_img'] = img_base64
+            #img = codecs.open(self._load_image(boletoDados.logo_image))
+            #aux = img.read()
+            #aux = base64.b64encode(aux)
+            #img_base64 = 'data:image/jpeg;base64,{0}'.format(aux)
+            #tpl_data['logo_img'] = img_base64   # Os códigos comentados foram substituídos pela linha 105
+            tpl_data['logo_img'] = self._load_image(boletoDados.logo_image)
         tpl_data['codigo_dv_banco'] = boletoDados.codigo_dv_banco
 
         # Corpo
@@ -154,8 +157,8 @@ class BoletoHTML(object):
         data_vencimento = boletoDados.data_vencimento
         tpl_data['data_vencimento'] = data_vencimento.strftime('%d/%m/%Y')
 
-        # value em unicode em data.py
-        if isinstance(boletoDados.local_pagamento, unicode):
+        # value em str em data.py
+        if isinstance(boletoDados.local_pagamento, str):
             tpl_data['local_pagamento'] = boletoDados.local_pagamento.encode
             ('utf-8')
         else:
@@ -194,6 +197,10 @@ class BoletoHTML(object):
 
         # Código de barras
         tpl_data['barcode'] = self._codigoBarraI25(boletoDados.barcode)
+
+        # QRCode Pix
+        tpl_data['pix'] = self._qrcode_pix(boletoDados.pix)
+        tpl_data['colspan_instrucoes'] = 4 if boletoDados.pix else 6
 
         self.html += tpl.substitute(tpl_data)
 
@@ -272,3 +279,19 @@ class BoletoHTML(object):
         """grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
         args = [iter(iterable)] * n
         return zip_longest(fillvalue=fillvalue, *args)
+    
+    def _qrcode_pix(self, pix):
+        if not pix:
+            return ''
+        img = qrcode.make(pix, border=0)
+        img_buffer = BytesIO()
+        img.save(img_buffer, format='JPEG')
+        b64 = base64.b64encode(img_buffer.getvalue())
+        qr = (b'data:image/jpeg;base64,' + b64).decode('utf-8')
+
+        return f'''
+        <td colspan="2" rowspan="5" class="linha-grossa">
+            <div class="rotulo">Pagar boleto via QR Code Pix</div>
+            <img class="qrcode-pix" src="{qr}" alt="QRCode Pix">
+        </td>
+        '''

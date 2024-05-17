@@ -10,6 +10,9 @@
 
 """
 import os
+from pyboleto.html import BoletoHTML
+from weasyprint import HTML, CSS
+from weasyprint.fonts import FontConfiguration
 
 from reportlab.graphics.barcode.common import I2of5
 from reportlab.lib.colors import black
@@ -881,3 +884,24 @@ def load_image(logo_image):
     pyboleto_dir = os.path.dirname(os.path.abspath(__file__))
     image_path = os.path.join(pyboleto_dir, 'media', logo_image)
     return image_path
+
+
+class NewBoletoPDF(BoletoHTML):
+    
+    def save(self):
+        self.html += '</div></body></html>'
+
+        # Generate using WeasyPrint instead of ReportLab
+        font = FontConfiguration()
+        html = HTML(string=self.html, base_url=os.path.abspath(__file__))
+        css = CSS(string='''
+            @page { 
+                size: A4; 
+                margin: 0px 
+            }
+            * {
+                font-family: Helvetica, Arial, "Lucida Grande", sans-serif;
+            }
+        ''', font_config=font)
+
+        html.write_pdf(self.fileDescr, stylesheets=[css], font_config=font)

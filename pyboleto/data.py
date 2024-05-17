@@ -162,6 +162,7 @@ class BoletoData(object):
         self.sacado_endereco = kwargs.pop('sacado_endereco', "")
         self.sacado_bairro = kwargs.pop('sacado_bairro', "")
         self.sacado_cep = kwargs.pop('sacado_cep', "")
+        self.pix = kwargs.pop('pix', "")
         if kwargs:
             raise TypeError("Paramêtro(s) desconhecido: %r" % (kwargs, ))
         self._cedente_endereco = None
@@ -210,10 +211,11 @@ class BoletoData(object):
                      len(value)))
 
         due_date_days = (self.data_vencimento - _EPOCH).days
-        if not (9999 >= due_date_days >= 0):
-            raise TypeError(
-                "Invalid date, must be between 1997/07/01 and "
-                "2024/11/15")
+
+        # https://github.com/eduardocereto/pyboleto/issues/72#issuecomment-704695086
+        if due_date_days > 9999:
+            due_date_days -= 9000
+        
         num = "%s%1s%04d%010d%24s" % (self.codigo_banco,
                                       self.moeda,
                                       due_date_days,

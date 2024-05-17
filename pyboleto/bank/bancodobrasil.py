@@ -24,9 +24,9 @@ from pyboleto.data import BoletoData, CustomProperty
 
 
 class BoletoBB(BoletoData):
-    '''
-        Gera Dados necessários para criação de boleto para o Banco do Brasil
-    '''
+    """
+    Gera Dados necessários para criação de boleto para o Banco do Brasil
+    """
 
     agencia_cedente = CustomProperty('agencia_cedente', 4)
     conta_cedente = CustomProperty('conta_cedente', 8)
@@ -103,9 +103,9 @@ class BoletoBB(BoletoData):
     def agencia_conta_cedente(self):
         return "%s-%s / %s-%s" % (
             self.agencia_cedente,
-            self.modulo11(self.agencia_cedente),
+            self.modulo11(self.agencia_cedente.replace('X', '0')),
             self.conta_cedente,
-            self.modulo11(self.conta_cedente)
+            self.modulo11(self.conta_cedente.replace('X', '0'))
         )
 
     @property

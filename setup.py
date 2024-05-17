@@ -2,7 +2,6 @@
 
 import os
 import re
-import sys
 
 from setuptools import setup, find_packages
 
@@ -67,8 +66,9 @@ setup(
     platforms='any',
     test_suite='tests.alltests.suite',
     install_requires=[
-        'distribute',
-        'reportlab'
+        'reportlab',
+        'qrcode',
+        'weasyprint'
     ],
     tests_require=[
         'pylint',

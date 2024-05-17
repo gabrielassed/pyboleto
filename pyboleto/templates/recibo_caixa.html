@@ -24,10 +24,10 @@
       </tr>
       <tr>
         <td colspan="6">
-          <div class="rotulo">Cedente</div> ${cedente}
+          <div class="rotulo">Beneficiário</div> ${cedente}
         </td>
         <td>
-          <div class="rotulo">Agência/Código cedente</div>
+          <div class="rotulo">Agência/Código beneficiário</div>
           ${agencia_conta_cedente}
         </td>
       </tr>
@@ -72,12 +72,12 @@
         </td>
       </tr>
       <tr>
-        <td colspan="6" rowspan="5" class="linha-grossa">
+        <td colspan="${colspan_instrucoes}" rowspan="5" class="linha-grossa">
           <div class="rotulo">Instruções
-          (Todas as informações deste bloqueto são de exclusiva
-           responsabilidade do cedente)</div>
+          (Texto de responsabilidade do beneficiário)</div>
            <div class="instrucoes-content">${instrucoes}</div>
         </td>
+        ${pix}
         <td>
           <div class="rotulo">(-) Descontos/Abatimentos</div>
         </td>
@@ -107,7 +107,7 @@
   <table class="rodape">
     <tbody>
       <tr>
-        <td class="col-sacado"><div class="rotulo">Sacado</div></td>
+        <td class="col-sacado"><div class="rotulo">Pagador</div></td>
         <td colspan="3">${sacado_info}</td>
       </tr>
       <tr class="linha-grossa">
