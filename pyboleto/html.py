@@ -54,7 +54,7 @@ class BoletoHTML(object):
 
     """
 
-    def __init__(self, file_descr, landscape=False):
+    def __init__(self, file_descr, landscape=False, **kwargs):
         # Tamanhos em px
         self.width = 750
         self.widthCanhoto = 0
@@ -63,6 +63,8 @@ class BoletoHTML(object):
         self.fontSizeValue = 12
         self.title = 'Boleto bancário'
         self.fileDescr = file_descr
+
+        self.qrcode_by_url = kwargs.pop('qrcode_by_url', None)
 
         if landscape:
             raise NotImplementedError('Em desenvolvimento...')
@@ -283,15 +285,20 @@ class BoletoHTML(object):
     def _qrcode_pix(self, pix):
         if not pix:
             return ''
-        img = qrcode.make(pix, border=0)
-        img_buffer = BytesIO()
-        img.save(img_buffer, format='JPEG')
-        b64 = base64.b64encode(img_buffer.getvalue())
-        qr = (b'data:image/jpeg;base64,' + b64).decode('utf-8')
+        
+        if not self.qrcode_by_url:
+            img = qrcode.make(pix, border=0)
+            img_buffer = BytesIO()
+            img.save(img_buffer, format='JPEG')
+            b64 = base64.b64encode(img_buffer.getvalue())
+            qr = (b'data:image/jpeg;base64,' + b64).decode('utf-8')
+        else:
+            qr = self.qrcode_by_url
 
         return f'''
-        <td colspan="2" rowspan="5" class="linha-grossa">
-            <div class="rotulo">Pagar boleto via QR Code Pix</div>
-            <img class="qrcode-pix" src="{qr}" alt="QRCode Pix">
-        </td>
-        '''
+            <td colspan="2" rowspan="5" class="linha-grossa">
+                <div class="rotulo">Pagar boleto via QR Code Pix</div>
+                <img class="qrcode-pix" src="{qr}" alt="QRCode Pix">
+            </td>
+            '''
+

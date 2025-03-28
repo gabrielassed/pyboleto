@@ -210,7 +210,12 @@ class BoletoData(object):
                      value,
                      len(value)))
 
-        due_date_days = (self.data_vencimento - _EPOCH).days
+        # Tratar casos em que vencimento for um datetime
+        vencimento = self.data_vencimento
+        if isinstance(vencimento, datetime.datetime):
+            vencimento = vencimento.date()
+
+        due_date_days = (vencimento - _EPOCH).days
 
         # https://github.com/eduardocereto/pyboleto/issues/72#issuecomment-704695086
         if due_date_days > 9999:
